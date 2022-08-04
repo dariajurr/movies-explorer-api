@@ -45,28 +45,21 @@ module.exports.singup = (req, res, next) => {
 
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, email } = req.body;
-  User.findOne({ email })
+  User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
     .then((user) => {
-      if (user) {
-        throw new DuplicateError('Пользователь с таким email уже зарегестрирован');
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      } else {
+        res.send(user);
       }
     })
-    .then(() => {
-      User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
-        .then((user) => {
-          if (!user) {
-            throw new NotFoundError('Пользователь не найден');
-          } else {
-            res.send(user);
-          }
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            next(new BadRequestError('Переданны некорректные данные'));
-          } else {
-            next(err);
-          }
-        });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданны некорректные данные'));
+      }
+      if (err.code === 11000) {
+        next(new DuplicateError('Пользователь с таким email уже зарегестрирован'));
+      }
     })
     .catch(next);
 };
@@ -85,7 +78,6 @@ module.exports.singin = (req, res, next) => {
         bcrypt.compare(password, user.password),
       ]);
     })
-    // eslint-disable-next-line consistent-return
     .then(([user, matched]) => {
       if (!matched) {
         next(new AuthorizationError('Не верное имя пользователя и пароля'));

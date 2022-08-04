@@ -21,8 +21,8 @@ module.exports.singupValidation = celebrate({
 
 module.exports.updateUserInfoValidation = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    email: Joi.string().email(),
+    name: Joi.string().required().min(2).max(30),
+    email: Joi.string().required().email(),
   }),
 });
 
@@ -35,9 +35,9 @@ module.exports.postMoviesValidation = celebrate({
     duration: Joi.number().required(),
     year: Joi.number().required().integer(),
     description: Joi.string().required(),
-    image: Joi.string().required().uri(),
-    trailerLink: Joi.string().required().uri(),
-    thumbnail: Joi.string().required().uri(),
+    image: Joi.string().pattern(/^https?:\/\/(w{3}\.)?\S+\.\w+(\/\S+)*#?/),
+    trailerLink: Joi.string().pattern(/^https?:\/\/(w{3}\.)?\S+\.\w+(\/\S+)*#?/),
+    thumbnail: Joi.string().pattern(/^https?:\/\/(w{3}\.)?\S+\.\w+(\/\S+)*#?/),
     movieId: Joi.number().integer().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
