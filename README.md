@@ -1,4 +1,5 @@
 # movies-explorer-api
+Бекенд часть сервиса movies-explorer
 
 ## Директории
 
